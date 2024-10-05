@@ -51,9 +51,9 @@ export default function AuditHistory() {
         return () => unsubscribe()
     }, [])
 
-    const addAuditEntry = (newEntry) => {
-        setAudits((prevAudits) => [...prevAudits, newEntry])
-    }
+    // const addAuditEntry = (newEntry) => {
+    //     setAudits((prevAudits) => [...prevAudits, newEntry])
+    // }
 
     // Example function to generate a new audit entry (still uses faker for example purposes)
     const handleSubmit = () => {
