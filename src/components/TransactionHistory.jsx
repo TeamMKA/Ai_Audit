@@ -17,6 +17,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import auditData from "../assets/data"; // Import your data file
 
 // Main audit categories
 const auditCategories = {
@@ -40,35 +41,39 @@ const auditTypes = {
 const departments = ["HR", "Finance", "Research", "Admissions", "IT Support"];
 const statuses = ["Pending", "Completed", "Failed"];
 
-// Fake data generator for audits
-function generateFakeAuditData(numEntries) {
-    const audits = [];
-    for (let i = 0; i < numEntries; i++) {
-        const category = faker.helpers.objectKey(auditCategories);
-        const type = faker.helpers.arrayElement(auditTypes[category]);
-        const auditEntry = {
-            id: faker.string.uuid(),
-            category: auditCategories[category], // Main category
-            type,
-            amount: faker.finance.amount(1000, 50000, 2),
-            department: faker.helpers.arrayElement(departments),
-            payeeName: faker.person.fullName(),
-            status: faker.helpers.arrayElement(statuses),
-            date: faker.date.recent().toLocaleDateString(),
-        };
-        audits.push(auditEntry);
-    }
-    return audits;
-}
-
 export default function AuditHistory() {
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [audits, setAudits] = useState([]);
 
     useEffect(() => {
-        const data = generateFakeAuditData(15); // Generate 15 entries
-        setAudits(data);
+        setAudits(auditData); 
+        // console.log(auditData)
+       // Load initial data from the file
     }, []);
+
+    const addAuditEntry = (newEntry) => {
+        setAudits((prevAudits) => [...prevAudits, newEntry]);
+        
+        // Optionally, save the updated audits to the data file (if needed)
+    };
+
+    // Example function to generate a new audit entry
+    const handleSubmit = () => {
+        const category = faker.helpers.objectKey(auditCategories);
+        const type = faker.helpers.arrayElement(auditTypes[category]);
+        const newAuditEntry = {
+            id: faker.string.uuid(),
+            category: auditCategories[category],
+            type,
+            amount: faker.finance.amount(1000, 50000, 2),
+            department: faker.helpers.arrayElement(departments),
+            payee: faker.person.fullName(), // Changed from payeeName to payee
+            status: faker.helpers.arrayElement(statuses),
+            dateTime: faker.date.recent().toLocaleString(), // Ensures the date is stored in a usable format
+        };
+        addAuditEntry(newAuditEntry);
+        console.log(newAuditEntry)
+    };
 
     return (
         <div className="container mx-auto p-4">
@@ -90,8 +95,9 @@ export default function AuditHistory() {
                             ))}
                         </SelectContent>
                     </Select>
-                    <Button variant="outline">
-                        15 Mar - 22 Mar <ChevronDown className="ml-2 h-4 w-4" />
+                    <Button variant="outline" onClick={handleSubmit}>
+                        Add Audit Entry
+                        <ChevronDown className="ml-2 h-4 w-4" />
                     </Button>
                 </div>
             </div>
@@ -99,13 +105,12 @@ export default function AuditHistory() {
             <Table>
                 <TableHeader>
                     <TableRow>
-                        {/* <TableHead>CATEGORY</TableHead> */}
                         <TableHead>TYPE</TableHead>
                         <TableHead>AMOUNT</TableHead>
                         <TableHead>DEPARTMENT</TableHead>
-                        <TableHead>PAYEE NAME</TableHead>
+                        <TableHead>PAYEE NAME</TableHead> {/* Updated to 'payee' */}
                         <TableHead>STATUS</TableHead>
-                        <TableHead>DATE</TableHead>
+                        <TableHead>DATE</TableHead> {/* Updated to 'date' */}
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -116,11 +121,10 @@ export default function AuditHistory() {
                         )
                         .map((audit) => (
                             <TableRow key={audit.id}>
-                                {/* <TableCell>{audit.category}</TableCell> */}
                                 <TableCell>{audit.type}</TableCell>
                                 <TableCell>${audit.amount}</TableCell>
                                 <TableCell>{audit.department}</TableCell>
-                                <TableCell>{audit.payeeName}</TableCell>
+                                <TableCell>{audit.payee}</TableCell> {/* Updated to 'payee' */}
                                 <TableCell>
                                     <span
                                         className={`px-2 py-1 rounded-full text-xs ${
@@ -134,7 +138,7 @@ export default function AuditHistory() {
                                         {audit.status}
                                     </span>
                                 </TableCell>
-                                <TableCell>{audit.date}</TableCell>
+                                <TableCell>{audit.dateTime}</TableCell> 
                             </TableRow>
                         ))}
                 </TableBody>

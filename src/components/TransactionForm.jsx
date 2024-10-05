@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +19,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+import Papa from "papaparse"; // For CSV parsing
+import * as XLSX from "xlsx"; // For Excel parsing
+
 // Define the audit types, departments, and statuses based on the Faker data
 const auditTypes = [
   "Salary Payment",
@@ -29,7 +33,7 @@ const auditTypes = [
 const departments = ["HR", "Finance", "Research", "Admissions", "IT Support"];
 const statuses = ["Pending", "Completed", "Failed"];
 
-export default function AuditForm({ passFileToParent }) {
+export default function AuditForm() {
   const [type, setType] = useState("");
   const [amount, setAmount] = useState("");
   const [department, setDepartment] = useState("");
@@ -40,12 +44,22 @@ export default function AuditForm({ passFileToParent }) {
   const [uploadType, setUploadType] = useState("manual"); // 'manual' or 'csv'
   const [transactionHistory, setTransactionHistory] = useState([]); // Transaction history state
 
+  // Load existing transaction history from local storage on component mount
   useEffect(() => {
+    const storedAudits = JSON.parse(localStorage.getItem("audits")) || [];
+    setTransactionHistory(storedAudits);
+
     const currentDateTime = new Date().toLocaleString();
     setDateTime(currentDateTime);
   }, []);
 
-  const handleSubmit = (e) => {
+  const addAuditEntry = (newEntry) => {
+    const updatedAudits = [...transactionHistory, newEntry];
+    localStorage.setItem("audits", JSON.stringify(updatedAudits)); // Save to local storage
+    setTransactionHistory(updatedAudits);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (uploadType === "manual") {
@@ -59,16 +73,17 @@ export default function AuditForm({ passFileToParent }) {
       };
 
       // Add the audit entry to the transaction history
-      setTransactionHistory((prevHistory) => [...prevHistory, auditEntry]);
+      addAuditEntry(auditEntry);
 
       console.log("Manual entry added to history:", auditEntry);
       alert("Audit submitted!");
 
+    } else if (file) {
+      // Handle CSV/Excel file upload
+      await parseFile(file);
+      
     } else {
-      console.log("File upload:", file);
-      // Save or pass file to parent component for further processing
-      passFileToParent(file);
-      alert("Audit submitted from file!");
+      alert("No file selected!");
     }
 
     // Reset fields for a new entry
@@ -83,6 +98,50 @@ export default function AuditForm({ passFileToParent }) {
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
+  };
+
+  // Helper function to parse CSV or Excel file
+  const parseFile = async (file) => {
+    const fileExtension = file.name.split(".").pop().toLowerCase();
+
+    if (fileExtension === "csv") {
+      // Parse CSV file
+      Papa.parse(file, {
+        header: true,
+        complete: (result) => {
+          const parsedData = result.data.map((row) => ({
+            type: row.type || "",
+            amount: row.amount || "",
+            department: row.department || "",
+            payee: row.payee || "",
+            status: row.status || "",
+            dateTime: row.dateTime || new Date().toLocaleString(),
+          }));
+          console.log("CSV File Parsed Data:", parsedData);
+        },
+      });
+    } else if (["xls", "xlsx"].includes(fileExtension)) {
+      // Parse Excel file
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+        const parsedData = jsonData.map((row) => ({
+          type: row.type || "",
+          amount: row.amount || "",
+          department: row.department || "",
+          payee: row.payee || "",
+          status: row.status || "",
+          dateTime: row.dateTime || new Date().toLocaleString(),
+        }));
+        console.log("Excel File Parsed Data:", parsedData);
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      alert("Unsupported file format. Please upload a CSV or Excel file.");
+    }
   };
 
   return (
@@ -206,31 +265,17 @@ export default function AuditForm({ passFileToParent }) {
             <Input
               id="fileUpload"
               type="file"
-              accept=".csv, .xlsx"
+              accept=".csv, .xls, .xlsx"
               onChange={handleFileChange}
-              className={`${file ? "bg-blue-100" : ""}`} // Highlight when a file is selected
             />
           </div>
         )}
       </CardContent>
-      <CardFooter>
-        <Button onClick={handleSubmit} className="w-full">
-          Submit Audit
+      <CardFooter className="flex justify-end space-x-2">
+        <Button onClick={handleSubmit} className="bg-blue-500 text-white">
+          Submit
         </Button>
       </CardFooter>
-
-      {/* Display the transaction history */}
-      <CardContent>
-        <CardTitle>Transaction History</CardTitle>
-        <ul>
-          {transactionHistory.map((entry, index) => (
-            <li key={index} className="mt-2">
-              {entry.type} - {entry.amount} - {entry.department} - {entry.payee} -{" "}
-              {entry.status} - {entry.dateTime}
-            </li>
-          ))}
-        </ul>
-      </CardContent>
     </Card>
   );
 }
