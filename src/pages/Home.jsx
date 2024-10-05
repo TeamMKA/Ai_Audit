@@ -1,7 +1,10 @@
+import TransactionForm from "../components/TransactionForm"
 
 const Home = () => {
   return (
-    <div>Home</div>
+    <div>
+      <TransactionForm/>
+    </div>
   )
 }
 
