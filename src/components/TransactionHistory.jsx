@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
-import { faker } from "@faker-js/faker";
-import { ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react"
+import { db } from "../service/firebase.js"
+import { collection, getDocs } from "firebase/firestore"
+import { ChevronDown } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import {
     Select,
     SelectContent,
@@ -16,64 +17,47 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
-import auditData from "../assets/data"; // Import your data file
+} from "@/components/ui/table"
 
-// Main audit categories
-const auditCategories = {
-    revenue: "Revenue",
-    expenditure: "Expenditure",
-    capital_expenditure: "Capital Expenditure",
-    scholarships_financial_aid: "Scholarships and Financial Aid",
-    loans_debt_payments: "Loans and Debt Payments",
-};
+export default function TransactionHistory() {
+    const [dateRange, setDateRange] = useState("Last 7 days")
+    const [transactionType, setTransactionType] = useState("All")
+    const [transactions, setTransactions] = useState([])
 
-// Audit types based on the categories
-const auditTypes = {
-    revenue: ["Grants and Donations", "Miscellaneous Income"],
-    expenditure: ["Salary Payment", "Equipment Purchase", "Service Contract", "Administrative Costs"],
-    capital_expenditure: ["New Infrastructure Development", "Equipment Purchases"],
-    scholarships_financial_aid: ["Scholarship Disbursement", "Student Aid"],
-    loans_debt_payments: ["Loan Repayment", "Interest Payments"],
-};
-
-// Departments
-const departments = ["HR", "Finance", "Research", "Admissions", "IT Support"];
-const statuses = ["Pending", "Completed", "Failed"];
-
-export default function AuditHistory() {
-    const [selectedCategory, setSelectedCategory] = useState("All");
-    const [audits, setAudits] = useState([]);
+    const transactionTypeLabels = {
+        teacher_salary_payment: "Teacher Salary Payment",
+        student_fee_payment: "Student Fee Payment",
+        college_rent_payment: "College Rent Payment",
+        logistics_payment: "Logistics Payment",
+        salary_payment: "Salary Payment",
+    }
 
     useEffect(() => {
-        setAudits(auditData); 
-        // console.log(auditData)
-       // Load initial data from the file
-    }, []);
+        const fetchTransactions = async () => {
+            const transactionsCollection = collection(db, "transactions")
+            const transactionSnapshot = await getDocs(transactionsCollection)
+            const transactionsList = transactionSnapshot.docs.map((doc) => {
+                const data = doc.data()
+                return {
+                    id: doc.id,
+                    type: data.transaction_type,
+                    amount: data.payment_details.total_amount.value,
+                    currency: data.payment_details.total_amount.currency,
+                    name: data.payee_details
+                        ? data.payee_details.name.first_name &&
+                          data.payee_details.name.last_name
+                            ? `${data.payee_details.name.first_name} ${data.payee_details.name.last_name}`
+                            : "College"
+                        : "College",
+                    status: data.status,
+                }
+            })
+            setTransactions(transactionsList)
+            console.log("Transactions:", transactionsList)
+        }
 
-    const addAuditEntry = (newEntry) => {
-        setAudits((prevAudits) => [...prevAudits, newEntry]);
-        
-        // Optionally, save the updated audits to the data file (if needed)
-    };
-
-    // Example function to generate a new audit entry
-    const handleSubmit = () => {
-        const category = faker.helpers.objectKey(auditCategories);
-        const type = faker.helpers.arrayElement(auditTypes[category]);
-        const newAuditEntry = {
-            id: faker.string.uuid(),
-            category: auditCategories[category],
-            type,
-            amount: faker.finance.amount(1000, 50000, 2),
-            department: faker.helpers.arrayElement(departments),
-            payee: faker.person.fullName(), // Changed from payeeName to payee
-            status: faker.helpers.arrayElement(statuses),
-            dateTime: faker.date.recent().toLocaleString(), // Ensures the date is stored in a usable format
-        };
-        addAuditEntry(newAuditEntry);
-        console.log(newAuditEntry)
-    };
+        fetchTransactions()
+    }, [])
 
     return (
         <div className="container mx-auto p-4">

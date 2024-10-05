@@ -49,7 +49,7 @@ const generateDocuments = () => {
                     fee_period: "2024-09",
                     fee_amount: {
                         value: 1500,
-                        currency: "USD",
+                        currency: "INR",
                     },
                     bank_details: {
                         bank_name: "Bank of Education",
@@ -60,7 +60,7 @@ const generateDocuments = () => {
                 payment_details: {
                     total_amount: {
                         value: 1500,
-                        currency: "USD",
+                        currency: "INR",
                     },
                     method: "blockchain",
                     payment_reference_id: `pay_${Math.random()
@@ -121,10 +121,10 @@ const generateDocuments = () => {
                     salary_period: "2024-09",
                     salary_amount: {
                         value: 3000,
-                        currency: "USD",
+                        currency: "INR",
                     },
                     bank_details: {
-                        bank_name: "Bank of Education",
+                        bank_name: "Bank of Education", 
                         account_number: "123456789",
                         iban: "IBAN1234567890",
                     },
@@ -132,7 +132,7 @@ const generateDocuments = () => {
                 payment_details: {
                     total_amount: {
                         value: 3000,
-                        currency: "USD",
+                        currency: "INR",
                     },
                     method: "blockchain",
                     payment_reference_id: `pay_${Math.random()
@@ -187,7 +187,7 @@ const generateDocuments = () => {
                     service_type: "equipment_delivery",
                     logistics_cost: {
                         value: 500,
-                        currency: "USD",
+                        currency: "INR",
                     },
                     delivery_date: "2024-09-30",
                     status: "delivered",
@@ -195,7 +195,7 @@ const generateDocuments = () => {
                 payment_details: {
                     total_amount: {
                         value: 500,
-                        currency: "USD",
+                        currency: "INR",
                     },
                     method: "blockchain",
                     payment_reference_id: `pay_${Math.random()
@@ -245,7 +245,7 @@ const generateDocuments = () => {
                 payment_details: {
                     total_amount: {
                         value: 10000,
-                        currency: "USD",
+                        currency: "INR",
                     },
                     method: "blockchain",
                     payment_reference_id: `pay_${Math.random()
@@ -271,8 +271,8 @@ const generateDocuments = () => {
         const document = transactionType.getDetails()
         documents.push(document)
     }
-    console.log("");
-    
+    console.log("")
+
     return documents
 }
 
