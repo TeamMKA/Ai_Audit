@@ -6,6 +6,7 @@ import Trail from "./pages/Trail"
 import TransactionHistory from "./components/TransactionHistory.jsx"
 import UploadDoc from "./components/UploadDoc.jsx"
 import DashBoard from "./pages/DashBoard"
+import Anomalies from "./pages/Anomalies"
 
 const App = () => {
     return (
@@ -18,6 +19,7 @@ const App = () => {
                     <Route exact path="/history" element={<TransactionHistory />} />
                     <Route exact path="/upload" element={<UploadDoc />} />
                     <Route exact path="/dashboard" element={<DashBoard />} />
+                    <Route exact path="/anom" element={<Anomalies />} />
                 </Routes>
                 <Footer />
             </div>
