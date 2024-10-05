@@ -1,4 +1,3 @@
-// src/App.js
 import React from "react"
 import generateDocuments from "../service/generateDocument.js"
 import uploadDocuments from "../service/uploadDocument.js"

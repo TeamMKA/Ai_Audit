@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { db } from "../service/firebase.js" // Adjust the import according to your structure
+import { db } from "../service/firebase.js"
 import { collection, getDocs } from "firebase/firestore"
 import { ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -24,15 +24,14 @@ export default function TransactionHistory() {
     const [transactionType, setTransactionType] = useState("All")
     const [transactions, setTransactions] = useState([])
 
-    // Transaction type mapping for display
     const transactionTypeLabels = {
         teacher_salary_payment: "Teacher Salary Payment",
         student_fee_payment: "Student Fee Payment",
         college_rent_payment: "College Rent Payment",
         logistics_payment: "Logistics Payment",
+        salary_payment: "Salary Payment",
     }
 
-    // Fetch transactions from Firestore
     useEffect(() => {
         const fetchTransactions = async () => {
             const transactionsCollection = collection(db, "transactions")
@@ -49,7 +48,7 @@ export default function TransactionHistory() {
                           data.payee_details.name.last_name
                             ? `${data.payee_details.name.first_name} ${data.payee_details.name.last_name}`
                             : "College"
-                        : "College", // Default value if payee_details is missing
+                        : "College",
                     status: data.status,
                 }
             })
