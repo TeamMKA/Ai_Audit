@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react"
-import { db } from "../service/firebase.js"
-import { collection, getDocs } from "firebase/firestore"
 import { ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -9,7 +7,7 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui/select"
 import {
     Table,
     TableBody,
@@ -19,45 +17,48 @@ import {
     TableRow,
 } from "@/components/ui/table"
 
-export default function TransactionHistory() {
-    const [dateRange, setDateRange] = useState("Last 7 days")
-    const [transactionType, setTransactionType] = useState("All")
-    const [transactions, setTransactions] = useState([])
+import { db } from "../service/firebase.js" // Import your Firebase setup
+import { collection, onSnapshot } from "firebase/firestore" // Import onSnapshot from Firestore
 
-    const transactionTypeLabels = {
-        teacher_salary_payment: "Teacher Salary Payment",
-        student_fee_payment: "Student Fee Payment",
-        college_rent_payment: "College Rent Payment",
-        logistics_payment: "Logistics Payment",
-        salary_payment: "Salary Payment",
+// Main audit categories
+const auditCategories = {
+    "Salary Payment": "Salary Payment",
+    "Equipment Purchase": "Equipment Purchase",
+    "Service Contract": "Service Contract",
+    "Scholarship Disbursement": "Scholarship Disbursement",
+    "Research Grant": "Research Grant",
+}
+
+// Audit History Component
+export default function AuditHistory() {
+    const [selectedCategory, setSelectedCategory] = useState("All")
+    const [audits, setAudits] = useState([])
+
+    // Real-time listener to fetch audits from Firebase Firestore
+    useEffect(() => {
+        const auditCollection = collection(db, "audits")
+
+        // Use onSnapshot to listen to real-time updates
+        const unsubscribe = onSnapshot(auditCollection, (snapshot) => {
+            const auditList = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }))
+            setAudits(auditList) // Update the state with the new data
+        })
+
+        // Cleanup listener on component unmount
+        return () => unsubscribe()
+    }, [])
+
+    const addAuditEntry = (newEntry) => {
+        setAudits((prevAudits) => [...prevAudits, newEntry])
     }
 
-    useEffect(() => {
-        const fetchTransactions = async () => {
-            const transactionsCollection = collection(db, "transactions")
-            const transactionSnapshot = await getDocs(transactionsCollection)
-            const transactionsList = transactionSnapshot.docs.map((doc) => {
-                const data = doc.data()
-                return {
-                    id: doc.id,
-                    type: data.transaction_type,
-                    amount: data.payment_details.total_amount.value,
-                    currency: data.payment_details.total_amount.currency,
-                    name: data.payee_details
-                        ? data.payee_details.name.first_name &&
-                          data.payee_details.name.last_name
-                            ? `${data.payee_details.name.first_name} ${data.payee_details.name.last_name}`
-                            : "College"
-                        : "College",
-                    status: data.status,
-                }
-            })
-            setTransactions(transactionsList)
-            console.log("Transactions:", transactionsList)
-        }
-
-        fetchTransactions()
-    }, [])
+    // Example function to generate a new audit entry (still uses faker for example purposes)
+    const handleSubmit = () => {
+        console.log(" Will update with firebase")
+    }
 
     return (
         <div className="container mx-auto p-4">
@@ -66,17 +67,22 @@ export default function TransactionHistory() {
             <div className="flex justify-between items-center mb-4">
                 <div className="flex space-x-2">
                     {/* Select Audit Category */}
-                    <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <Select
+                        value={selectedCategory}
+                        onValueChange={setSelectedCategory}
+                    >
                         <SelectTrigger className="w-[180px]">
                             <SelectValue placeholder="Select Category" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="All">All Categories</SelectItem>
-                            {Object.entries(auditCategories).map(([key, label]) => (
-                                <SelectItem key={key} value={label}>
-                                    {label}
-                                </SelectItem>
-                            ))}
+                            {Object.entries(auditCategories).map(
+                                ([key, label]) => (
+                                    <SelectItem key={key} value={label}>
+                                        {label}
+                                    </SelectItem>
+                                )
+                            )}
                         </SelectContent>
                     </Select>
                     <Button variant="outline" onClick={handleSubmit}>
@@ -92,23 +98,24 @@ export default function TransactionHistory() {
                         <TableHead>TYPE</TableHead>
                         <TableHead>AMOUNT</TableHead>
                         <TableHead>DEPARTMENT</TableHead>
-                        <TableHead>PAYEE NAME</TableHead> {/* Updated to 'payee' */}
+                        <TableHead>PAYEE NAME</TableHead>
                         <TableHead>STATUS</TableHead>
-                        <TableHead>DATE</TableHead> {/* Updated to 'date' */}
+                        <TableHead>DATE</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {audits
                         .filter(
                             (audit) =>
-                                selectedCategory === "All" || audit.category === selectedCategory
+                                selectedCategory === "All" ||
+                                audit.category === selectedCategory
                         )
                         .map((audit) => (
                             <TableRow key={audit.id}>
                                 <TableCell>{audit.type}</TableCell>
                                 <TableCell>${audit.amount}</TableCell>
                                 <TableCell>{audit.department}</TableCell>
-                                <TableCell>{audit.payee}</TableCell> {/* Updated to 'payee' */}
+                                <TableCell>{audit.payee}</TableCell>
                                 <TableCell>
                                     <span
                                         className={`px-2 py-1 rounded-full text-xs ${
@@ -122,11 +129,12 @@ export default function TransactionHistory() {
                                         {audit.status}
                                     </span>
                                 </TableCell>
-                                <TableCell>{audit.dateTime}</TableCell> 
+                                <TableCell>{audit.dateTime}</TableCell>
                             </TableRow>
                         ))}
                 </TableBody>
             </Table>
         </div>
-    );
+    )
 }
+    
