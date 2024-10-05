@@ -11,8 +11,8 @@ const App = () => {
             <div>
                 <Navbar />
                 <Routes>
-                    <Route exact path="/home" element={<Home />} />
-                    <Route exact path="/" element={<Trail />} />
+                    <Route exact path="/" element={<Home />} />
+                    <Route exact path="/trail" element={<Trail />} />
                     <Route
                         exact
                         path="/history"

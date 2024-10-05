@@ -115,7 +115,7 @@ export default function TransactionHistory() {
                         className="pl-10 w-[300px]"
                     />
                 </div>
-            </header>
+            </header> */}
 
             <nav className="flex space-x-4 mb-6">
                 <Button variant="ghost">Overview</Button>
@@ -125,7 +125,7 @@ export default function TransactionHistory() {
                 <Button variant="ghost">Billing</Button>
                 <Button variant="ghost">People</Button>
                 <Button variant="ghost">Report</Button>
-            </nav> */}
+            </nav>
 
             <h2 className="text-2xl font-bold mb-4">Activities</h2>
 
