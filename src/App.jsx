@@ -5,6 +5,9 @@ import Footer from "./components/Footer"
 import Trail from "./pages/Trail"
 import TransactionHistory from "./components/TransactionHistory.jsx"
 import UploadDoc from "./components/UploadDoc.jsx"
+import DashBoard from "./pages/DashBoard"
+import Anomalies from "./pages/Anomalies"
+import Analytics from "./pages/Analytics"
 import ReportBody from "./pages/Report.jsx"
 
 const App = () => {
@@ -18,6 +21,9 @@ const App = () => {
                     <Route exact path="/audits" element={<TransactionHistory />} />
                     <Route exact path="/reports" element={<ReportBody/>} />
                     <Route exact path="/upload" element={<UploadDoc />} />
+                    <Route exact path="/dashboard" element={<DashBoard />} />
+                    <Route exact path="/anom" element={<Anomalies />} />
+                    <Route exact path="/analytics" element={ <Analytics />} />
                 </Routes>
                 <Footer />
             </div>

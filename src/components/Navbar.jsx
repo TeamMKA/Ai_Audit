@@ -80,7 +80,13 @@ export default function Navbar() {
                   <SheetClose asChild>
                     <Link to="/analytics" className="flex text-black items-center space-x-2 text-base font-medium">
                       <BarChart className="h-5 w-5" />
-                      <span>Analytics</span>
+                      <span>Analytic</span>
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link to="/anom" className="flex text-black items-center space-x-2 text-base font-medium">
+                      <BarChart className="h-5 w-5" />
+                      <span>Anomalies</span>
                     </Link>
                   </SheetClose>
                 </div>
@@ -127,6 +133,9 @@ export default function Navbar() {
             </Link>
             <Link to="/analytics" className="text-sm font-medium">
               Analytics
+            </Link>
+            <Link to="/anom" className="text-sm font-medium">
+              Anomalies
             </Link>
           </div>
           <form className="hidden md:block">
