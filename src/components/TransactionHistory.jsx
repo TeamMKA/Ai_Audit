@@ -1,7 +1,8 @@
-import { useState } from "react"
-import { Search, ChevronDown } from "lucide-react"
+import { useEffect, useState } from "react"
+import { db } from "../service/firebase.js" // Adjust the import according to your structure
+import { collection, getDocs } from "firebase/firestore"
+import { ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import {
     Select,
     SelectContent,
@@ -18,68 +19,46 @@ import {
     TableRow,
 } from "@/components/ui/table"
 
-const transactions = [
-    {
-        type: "Sent",
-        amount: "- 500.00",
-        currency: "IDR",
-        paymentMethod: "Credit Card",
-        status: "Success",
-        activity: "Sending money to Raihan Fikri",
-    },
-    {
-        type: "Sent",
-        amount: "- 200,000",
-        currency: "IDR",
-        paymentMethod: "Wire Transfer",
-        status: "Success",
-        activity: "Sending money to Bani Zuhilmin",
-    },
-    {
-        type: "Received",
-        amount: "+ 1,500",
-        currency: "USD",
-        paymentMethod: "Bank Transfer",
-        status: "Success",
-        activity: "Received money from Andrew",
-    },
-    {
-        type: "Received",
-        amount: "+ 2,500",
-        currency: "USD",
-        paymentMethod: "PayPal",
-        status: "Success",
-        activity: "Payment for product",
-    },
-    {
-        type: "Received",
-        amount: "+ 1,500",
-        currency: "USD",
-        paymentMethod: "Payoneer",
-        status: "Incomplete",
-        activity: "Payment for invoice",
-    },
-    {
-        type: "Converted",
-        amount: "400,000",
-        currency: "IDR",
-        paymentMethod: "Debit Card",
-        status: "Failed",
-        activity: "Convert money from USD to IDR",
-    },
-    {
-        type: "Received",
-        amount: "+ 500",
-        currency: "USD",
-        paymentMethod: "Credit Card",
-        status: "Success",
-        activity: "Received money from Bani Zuhilmin",
-    },
-]
-
 export default function TransactionHistory() {
     const [dateRange, setDateRange] = useState("Last 7 days")
     const [transactionType, setTransactionType] = useState("All")
+    const [transactions, setTransactions] = useState([])
+
+    // Transaction type mapping for display
+    const transactionTypeLabels = {
+        teacher_salary_payment: "Teacher Salary Payment",
+        student_fee_payment: "Student Fee Payment",
+        college_rent_payment: "College Rent Payment",
+        logistics_payment: "Logistics Payment",
+    }
+
+    // Fetch transactions from Firestore
+    useEffect(() => {
+        const fetchTransactions = async () => {
+            const transactionsCollection = collection(db, "transactions")
+            const transactionSnapshot = await getDocs(transactionsCollection)
+            const transactionsList = transactionSnapshot.docs.map((doc) => {
+                const data = doc.data()
+                return {
+                    id: doc.id,
+                    type: data.transaction_type,
+                    amount: data.payment_details.total_amount.value,
+                    currency: data.payment_details.total_amount.currency,
+                    name: data.payee_details
+                        ? data.payee_details.name.first_name &&
+                          data.payee_details.name.last_name
+                            ? `${data.payee_details.name.first_name} ${data.payee_details.name.last_name}`
+                            : "College"
+                        : "College", // Default value if payee_details is missing
+                    status: data.status,
+                }
+            })
+            setTransactions(transactionsList)
+            console.log("Transactions:", transactionsList)
+        }
+
+        fetchTransactions()
+    }, [])
 
     return (
         <div className="container mx-auto p-4">
@@ -159,44 +138,78 @@ export default function TransactionHistory() {
                         }
                         onClick={() => setTransactionType("All")}
                     >
-                        All 35
+                        All {transactions.length}
                     </Button>
                     <Button
                         variant="outline"
                         className={
-                            transactionType === "Received" ? "bg-gray-200" : ""
+                            transactionType === "teacher_salary_payment"
+                                ? "bg-gray-200"
+                                : ""
                         }
-                        onClick={() => setTransactionType("Received")}
+                        onClick={() =>
+                            setTransactionType("teacher_salary_payment")
+                        }
                     >
-                        Received 15
+                        {transactionTypeLabels.teacher_salary_payment}{" "}
+                        {
+                            transactions.filter(
+                                (t) => t.type === "teacher_salary_payment"
+                            ).length
+                        }
                     </Button>
                     <Button
                         variant="outline"
                         className={
-                            transactionType === "Sent" ? "bg-gray-200" : ""
+                            transactionType === "student_fee_payment"
+                                ? "bg-gray-200"
+                                : ""
                         }
-                        onClick={() => setTransactionType("Sent")}
+                        onClick={() =>
+                            setTransactionType("student_fee_payment")
+                        }
                     >
-                        Sent 5
+                        {transactionTypeLabels.student_fee_payment}{" "}
+                        {
+                            transactions.filter(
+                                (t) => t.type === "student_fee_payment"
+                            ).length
+                        }
                     </Button>
                     <Button
                         variant="outline"
                         className={
-                            transactionType === "Convert" ? "bg-gray-200" : ""
+                            transactionType === "college_rent_payment"
+                                ? "bg-gray-200"
+                                : ""
                         }
-                        onClick={() => setTransactionType("Convert")}
+                        onClick={() =>
+                            setTransactionType("college_rent_payment")
+                        }
                     >
-                        Convert 10
+                        {transactionTypeLabels.college_rent_payment}{" "}
+                        {
+                            transactions.filter(
+                                (t) => t.type === "college_rent_payment"
+                            ).length
+                        }
                     </Button>
-                    <Select defaultValue="USD">
-                        <SelectTrigger className="w-[100px]">
-                            <SelectValue placeholder="Currency" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="USD">USD</SelectItem>
-                            <SelectItem value="IDR">IDR</SelectItem>
-                        </SelectContent>
-                    </Select>
+                    <Button
+                        variant="outline"
+                        className={
+                            transactionType === "logistics_payment"
+                                ? "bg-gray-200"
+                                : ""
+                        }
+                        onClick={() => setTransactionType("logistics_payment")}
+                    >
+                        {transactionTypeLabels.logistics_payment}{" "}
+                        {
+                            transactions.filter(
+                                (t) => t.type === "logistics_payment"
+                            ).length
+                        }
+                    </Button>
                 </div>
             </div>
 
@@ -205,57 +218,40 @@ export default function TransactionHistory() {
                     <TableRow>
                         <TableHead>TYPE</TableHead>
                         <TableHead>AMOUNT</TableHead>
-                        <TableHead>PAYMENT METHOD</TableHead>
+                        <TableHead>PAYEE NAME</TableHead>
                         <TableHead>STATUS</TableHead>
-                        <TableHead>ACTIVITY</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {transactions.map((transaction, index) => (
-                        <TableRow key={index}>
-                            <TableCell>
-                                <div
-                                    className={`flex items-center ${
-                                        transaction.type === "Sent"
-                                            ? "text-red-500"
-                                            : transaction.type === "Received"
-                                            ? "text-green-500"
-                                            : "text-blue-500"
-                                    }`}
-                                >
-                                    {transaction.type === "Sent" && (
-                                        <span className="mr-2">↑</span>
-                                    )}
-                                    {transaction.type === "Received" && (
-                                        <span className="mr-2">↓</span>
-                                    )}
-                                    {transaction.type === "Converted" && (
-                                        <span className="mr-2">↔</span>
-                                    )}
-                                    {transaction.type}
-                                </div>
-                            </TableCell>
-                            <TableCell>
-                                {transaction.amount} {transaction.currency}
-                            </TableCell>
-                            <TableCell>{transaction.paymentMethod}</TableCell>
-                            <TableCell>
-                                <span
-                                    className={`px-2 py-1 rounded-full text-xs ${
-                                        transaction.status === "Success"
-                                            ? "bg-green-100 text-green-800"
-                                            : transaction.status ===
-                                              "Incomplete"
-                                            ? "bg-yellow-100 text-yellow-800"
-                                            : "bg-red-100 text-red-800"
-                                    }`}
-                                >
-                                    {transaction.status}
-                                </span>
-                            </TableCell>
-                            <TableCell>{transaction.activity}</TableCell>
-                        </TableRow>
-                    ))}
+                    {transactions
+                        .filter(
+                            (transaction) =>
+                                transactionType === "All" ||
+                                transaction.type === transactionType
+                        )
+                        .map((transaction) => (
+                            <TableRow key={transaction.id}>
+                                <TableCell>
+                                    {transactionTypeLabels[transaction.type] ||
+                                        transaction.type}
+                                </TableCell>
+                                <TableCell>
+                                    {transaction.amount} {transaction.currency}
+                                </TableCell>
+                                <TableCell>{transaction.name}</TableCell>
+                                <TableCell>
+                                    <span
+                                        className={`px-2 py-1 rounded-full text-xs ${
+                                            transaction.status === "completed"
+                                                ? "bg-green-100 text-green-800"
+                                                : "bg-red-100 text-red-800"
+                                        }`}
+                                    >
+                                        {transaction.status}
+                                    </span>
+                                </TableCell>
+                            </TableRow>
+                        ))}
                 </TableBody>
             </Table>
         </div>
