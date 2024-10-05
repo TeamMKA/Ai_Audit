@@ -20,8 +20,18 @@ import {
 } from "@/components/ui/sheet"
 import { ClipboardList, Menu, Search, User, Home, FileText, BarChart, Settings, HelpCircle, LogOut } from "lucide-react"
 import { Link } from "react-router-dom" 
+
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+
+  const handleSignIn = () => {
+    setIsAuthenticated(true)
+  }
+
+  const handleSignOut = () => {
+    setIsAuthenticated(false)
+  }
 
   return (
     <nav className="border-b">
@@ -90,7 +100,7 @@ export default function Navbar() {
                     Help & Support
                   </Link>
                 </Button>
-                <Button variant="outline" className="w-full justify-start text-red-500 hover:text-red-600">
+                <Button variant="outline" className="w-full justify-start text-red-500 hover:text-red-600" onClick={handleSignOut}>
                   <LogOut className="mr-2 h-4 w-4" />
                   Log out
                 </Button>
@@ -143,7 +153,11 @@ export default function Navbar() {
               <DropdownMenuItem>Settings</DropdownMenuItem>
               <DropdownMenuItem>Help</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Log out</DropdownMenuItem>
+              {isAuthenticated ? (
+                <DropdownMenuItem onClick={handleSignOut}>Log out</DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem onClick={handleSignIn}>Sign in</DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
