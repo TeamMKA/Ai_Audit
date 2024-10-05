@@ -1,14 +1,13 @@
-import { useEffect, useState } from "react";
-import { faker } from "@faker-js/faker";
-import { ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react"
+import { ChevronDown } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui/select"
 import {
     Table,
     TableBody,
@@ -16,64 +15,50 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
-import auditData from "../assets/data"; // Import your data file
+} from "@/components/ui/table"
+
+import { db } from "../service/firebase.js" // Import your Firebase setup
+import { collection, onSnapshot } from "firebase/firestore" // Import onSnapshot from Firestore
 
 // Main audit categories
 const auditCategories = {
-    revenue: "Revenue",
-    expenditure: "Expenditure",
-    capital_expenditure: "Capital Expenditure",
-    scholarships_financial_aid: "Scholarships and Financial Aid",
-    loans_debt_payments: "Loans and Debt Payments",
-};
+    "Salary Payment": "Salary Payment",
+    "Equipment Purchase": "Equipment Purchase",
+    "Service Contract": "Service Contract",
+    "Scholarship Disbursement": "Scholarship Disbursement",
+    "Research Grant": "Research Grant",
+}
 
-// Audit types based on the categories
-const auditTypes = {
-    revenue: ["Grants and Donations", "Miscellaneous Income"],
-    expenditure: ["Salary Payment", "Equipment Purchase", "Service Contract", "Administrative Costs"],
-    capital_expenditure: ["New Infrastructure Development", "Equipment Purchases"],
-    scholarships_financial_aid: ["Scholarship Disbursement", "Student Aid"],
-    loans_debt_payments: ["Loan Repayment", "Interest Payments"],
-};
-
-// Departments
-const departments = ["HR", "Finance", "Research", "Admissions", "IT Support"];
-const statuses = ["Pending", "Completed", "Failed"];
-
+// Audit History Component
 export default function AuditHistory() {
-    const [selectedCategory, setSelectedCategory] = useState("All");
-    const [audits, setAudits] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState("All")
+    const [audits, setAudits] = useState([])
 
+    // Real-time listener to fetch audits from Firebase Firestore
     useEffect(() => {
-        setAudits(auditData); 
-        // console.log(auditData)
-       // Load initial data from the file
-    }, []);
+        const auditCollection = collection(db, "audits")
+
+        // Use onSnapshot to listen to real-time updates
+        const unsubscribe = onSnapshot(auditCollection, (snapshot) => {
+            const auditList = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }))
+            setAudits(auditList) // Update the state with the new data
+        })
+
+        // Cleanup listener on component unmount
+        return () => unsubscribe()
+    }, [])
 
     const addAuditEntry = (newEntry) => {
-        setAudits((prevAudits) => [...prevAudits, newEntry]);
-        
-        // Optionally, save the updated audits to the data file (if needed)
-    };
+        setAudits((prevAudits) => [...prevAudits, newEntry])
+    }
 
-    // Example function to generate a new audit entry
+    // Example function to generate a new audit entry (still uses faker for example purposes)
     const handleSubmit = () => {
-        const category = faker.helpers.objectKey(auditCategories);
-        const type = faker.helpers.arrayElement(auditTypes[category]);
-        const newAuditEntry = {
-            id: faker.string.uuid(),
-            category: auditCategories[category],
-            type,
-            amount: faker.finance.amount(1000, 50000, 2),
-            department: faker.helpers.arrayElement(departments),
-            payee: faker.person.fullName(), // Changed from payeeName to payee
-            status: faker.helpers.arrayElement(statuses),
-            dateTime: faker.date.recent().toLocaleString(), // Ensures the date is stored in a usable format
-        };
-        addAuditEntry(newAuditEntry);
-        console.log(newAuditEntry)
-    };
+        console.log(" Will update with firebase")
+    }
 
     return (
         <div className="container mx-auto p-4">
@@ -82,17 +67,22 @@ export default function AuditHistory() {
             <div className="flex justify-between items-center mb-4">
                 <div className="flex space-x-2">
                     {/* Select Audit Category */}
-                    <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <Select
+                        value={selectedCategory}
+                        onValueChange={setSelectedCategory}
+                    >
                         <SelectTrigger className="w-[180px]">
                             <SelectValue placeholder="Select Category" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="All">All Categories</SelectItem>
-                            {Object.entries(auditCategories).map(([key, label]) => (
-                                <SelectItem key={key} value={label}>
-                                    {label}
-                                </SelectItem>
-                            ))}
+                            {Object.entries(auditCategories).map(
+                                ([key, label]) => (
+                                    <SelectItem key={key} value={label}>
+                                        {label}
+                                    </SelectItem>
+                                )
+                            )}
                         </SelectContent>
                     </Select>
                     <Button variant="outline" onClick={handleSubmit}>
@@ -108,23 +98,24 @@ export default function AuditHistory() {
                         <TableHead>TYPE</TableHead>
                         <TableHead>AMOUNT</TableHead>
                         <TableHead>DEPARTMENT</TableHead>
-                        <TableHead>PAYEE NAME</TableHead> {/* Updated to 'payee' */}
+                        <TableHead>PAYEE NAME</TableHead>
                         <TableHead>STATUS</TableHead>
-                        <TableHead>DATE</TableHead> {/* Updated to 'date' */}
+                        <TableHead>DATE</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {audits
                         .filter(
                             (audit) =>
-                                selectedCategory === "All" || audit.category === selectedCategory
+                                selectedCategory === "All" ||
+                                audit.category === selectedCategory
                         )
                         .map((audit) => (
                             <TableRow key={audit.id}>
                                 <TableCell>{audit.type}</TableCell>
                                 <TableCell>${audit.amount}</TableCell>
                                 <TableCell>{audit.department}</TableCell>
-                                <TableCell>{audit.payee}</TableCell> {/* Updated to 'payee' */}
+                                <TableCell>{audit.payee}</TableCell>
                                 <TableCell>
                                     <span
                                         className={`px-2 py-1 rounded-full text-xs ${
@@ -138,11 +129,12 @@ export default function AuditHistory() {
                                         {audit.status}
                                     </span>
                                 </TableCell>
-                                <TableCell>{audit.dateTime}</TableCell> 
+                                <TableCell>{audit.dateTime}</TableCell>
                             </TableRow>
                         ))}
                 </TableBody>
             </Table>
         </div>
-    );
+    )
 }
+    

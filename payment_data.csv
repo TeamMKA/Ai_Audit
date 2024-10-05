@@ -1,0 +1,22 @@
+type,amount,department,payee,status
+Salary Payment,188.91,IT Support,Erma Hoeger,Completed
+Service Contract,782.57,Finance,Sophia Pollich,Completed
+Equipment Purchase,267.13,Admissions,Maryann Berge,Pending
+Service Contract,980.79,HR,Jimmie Simonis,Pending
+Scholarship Disbursement,367.16,IT Support,Dr. Erik Senger,Completed
+Salary Payment,557.55,Finance,Dr. Gordon Shanahan,Failed
+Salary Payment,479.53,Research,Leah Hoeger,Pending
+Scholarship Disbursement,47.49,HR,Trevor Hintz PhD,Completed
+Scholarship Disbursement,803.21,HR,Mr. Earnest Steuber,Completed
+Salary Payment,827.61,Admissions,Jasmine Weimann,Pending
+Scholarship Disbursement,920.49,Admissions,Ms. Elsa Harvey,Pending
+Research Grant,510.06,Research,Steven Casper,Failed
+Salary Payment,475.64,IT Support,Wilbur Fritsch-Dickinson,Pending
+Scholarship Disbursement,928.01,HR,Daryl Keebler,Completed
+Service Contract,555.72,IT Support,Joanne Wiza DVM,Completed
+Scholarship Disbursement,475.10,HR,Ross Rutherford DDS,Pending
+Scholarship Disbursement,826.77,Finance,Dennis Rempel III,Failed
+Scholarship Disbursement,220.68,HR,Kay Swift,Completed
+Scholarship Disbursement,971.95,Research,Mack Hauck,Failed
+Salary Payment,870.75,Admissions,Stanley Hansen,Failed
+Research Grant,557.40,Research,Rufus Hilpert,Pending
