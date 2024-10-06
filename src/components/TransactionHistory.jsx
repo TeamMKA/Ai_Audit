@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
-import { ChevronDown } from "lucide-react"
-import { Button } from "@/components/ui/button"
+// import { ChevronDown } from "lucide-react"
 import {
     Select,
     SelectContent,
@@ -29,9 +28,15 @@ const auditCategories = {
     "Research Grant": "Research Grant",
 }
 
+const timeCategories = {
+    "Daily": "Daily",
+    "Weekly": "Weekly",
+}
+
 // Audit History Component
 export default function AuditHistory() {
     const [selectedCategory, setSelectedCategory] = useState("All")
+    const [selectedTime, setSelectedTime] = useState("All Time")
     const [audits, setAudits] = useState([])
 
     // Real-time listener to fetch audits from Firebase Firestore
@@ -51,13 +56,20 @@ export default function AuditHistory() {
         return () => unsubscribe()
     }, [])
 
-    // const addAuditEntry = (newEntry) => {
-    //     setAudits((prevAudits) => [...prevAudits, newEntry])
-    // }
+    // Filter audits based on time (Daily/Weekly)
+    const filterByTime = (audit) => {
+        const auditDate = new Date(audit.dateTime)
+        const now = new Date()
 
-    // Example function to generate a new audit entry (still uses faker for example purposes)
-    const handleSubmit = () => {
-        console.log(" Will update with firebase")
+        if (selectedTime === "Daily") {
+            return auditDate.toDateString() === now.toDateString()
+        } else if (selectedTime === "Weekly") {
+            const oneWeekAgo = new Date()
+            oneWeekAgo.setDate(now.getDate() - 7)
+            return auditDate >= oneWeekAgo
+        }
+
+        return true // For "All Time"
     }
 
     return (
@@ -85,10 +97,26 @@ export default function AuditHistory() {
                             )}
                         </SelectContent>
                     </Select>
-                    <Button variant="outline" onClick={handleSubmit}>
-                        Add Audit Entry
-                        <ChevronDown className="ml-2 h-4 w-4" />
-                    </Button>
+
+                    {/* Select Time Category (Daily/Weekly) */}
+                    <Select
+                        value={selectedTime}
+                        onValueChange={setSelectedTime}
+                    >
+                        <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Select Time Frame" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="All Time">All Time</SelectItem>
+                            {Object.entries(timeCategories).map(
+                                ([key, label]) => (
+                                    <SelectItem key={key} value={label}>
+                                        {label}
+                                    </SelectItem>
+                                )
+                            )}
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
 
@@ -107,8 +135,9 @@ export default function AuditHistory() {
                     {audits
                         .filter(
                             (audit) =>
-                                selectedCategory === "All" ||
-                                audit.category === selectedCategory
+                                (selectedCategory === "All" ||
+                                    audit.category === selectedCategory) &&
+                                filterByTime(audit)
                         )
                         .map((audit) => (
                             <TableRow key={audit.id}>
@@ -137,4 +166,3 @@ export default function AuditHistory() {
         </div>
     )
 }
-    

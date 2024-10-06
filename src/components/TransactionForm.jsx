@@ -266,7 +266,7 @@ export default function AuditForm() {
                         onClick={() => setUploadType("manual")}
                         className={`${
                             uploadType === "manual"
-                                ? "bg-blue-500 text-white"
+                                ? "bg-black text-white"
                                 : "bg-gray-200 text-black"
                         }`}
                     >
@@ -276,7 +276,7 @@ export default function AuditForm() {
                         onClick={() => setUploadType("csv")}
                         className={`${
                             uploadType === "csv"
-                                ? "bg-blue-500 text-white"
+                                ? "bg-black text-white"
                                 : "bg-gray-200 text-black"
                         }`}
                     >
@@ -415,7 +415,7 @@ export default function AuditForm() {
             <CardFooter className="flex justify-end space-x-2">
                 <Button
                     onClick={handleSubmit}
-                    className="bg-blue-500 text-white"
+                    className="bg-black text-white"
                 >
                     Submit
                 </Button>
