@@ -14,7 +14,7 @@ import TransactionFrom from "./components/TransactionForm";
 import TallyReports from "./pages/TallyReports";
 import Workspace from "./pages/Workspace";
 import Price from "./pages/Price";
-import WebinarComponent from "./components/Zoom";
+
 
 const App = () => {
   return (

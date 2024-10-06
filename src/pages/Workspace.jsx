@@ -145,46 +145,68 @@ export default function Workspace() {
         </div>
 
         <div>
-
-        
-
-        {/* Main Content */}
-        <div className="flex-grow p-8">
-          <div className="max-w-4xl mx-auto">
-            <Input
-              className="w-full mb-8"
-              placeholder="Search with Google or enter address"
-              prefix={
-                <img
-                  src="/google-logo.svg"
-                  alt="Google"
-                  className="w-5 h-5 mr-2"
-                />
-              }
-            />
-            {selectedCard ? (
-              <Card className="p-6">
-                <h2 className="text-2xl font-bold mb-4">
-                  {findings.find((c) => c.id === selectedCard)?.description}
-                </h2>
-                <p>Edit your content here...</p>
-              </Card>
-            ) : (
-              <div className="text-center text-gray-500">
-                <p>Select a card to edit</p>
-              </div>
-            )}
+          {/* Main Content */}
+          <div className="flex-grow p-8">
+            <div className="max-w-4xl mx-auto">
+              <Input
+                className="w-full mb-8"
+                placeholder="Search with Google or enter address"
+                prefix={
+                  <img
+                    src="/google-logo.svg"
+                    alt="Google"
+                    className="w-5 h-5 mr-2"
+                  />
+                }
+              />
+              {selectedCard ? (
+                <Card className="p-6">
+                  <h2 className="text-2xl font-bold mb-4">
+                    {findings.find((c) => c.id === selectedCard)?.description}
+                  </h2>
+                  <div className="max-w-lg mx-auto p-6 bg-gray-50 border border-gray-300 rounded-md">
+                    <p className="text-base leading-relaxed text-gray-700">
+                      Dear [Recipient Name], <br />
+                      <br />I hope this message finds you well. Please find
+                      attached my telephone and internet bills for the period{" "}
+                      <strong>[Month, Year]</strong>. As per the company’s
+                      policy on communication expense reimbursement, I kindly
+                      request you to process the reimbursement for the amount
+                      stated below. <br />
+                      <br />
+                      <strong>AI Response:</strong> <br/>
+                      <br />
+                      <strong>Telephone Bill:</strong> [Amount] <br />
+                      <strong>Internet Bill:</strong> [Amount] <br />
+                      <strong>Total Amount:</strong> [Total Amount] <br />
+                      <br />
+                      Please let me know if any further details or documentation
+                      are required. I look forward to your confirmation of the
+                      reimbursement process. <br />
+                      <br />
+                      Thank you for your support. <br />
+                      <br />
+                      Best regards, <br />
+                      [Your Name] <br />
+                      [Your Designation] <br />
+                      [Company Name] <br />
+                    </p>
+                  </div>
+                </Card>
+              ) : (
+                <div className="text-center text-gray-500">
+                  <p>Select a card to edit</p>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
         </div>
       </div>
 
       {/* Canvas Area for Fabric.js */}
       <div className="w-full h-full p-8 bg-gray-100 flex justify-center items-center border-t border-gray-300">
         <div className="bg-white rounded-lg shadow-lg p-4">
-          <h2 className="text-xl font-bold mb-4 text-center">
-          Canva 
-          </h2>
+          <h2 className="text-xl font-bold mb-4 text-center">Canva</h2>
           <canvas
             ref={canvasRef}
             width="800"
