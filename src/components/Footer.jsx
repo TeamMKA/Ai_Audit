@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom"; // Import Link from React Router
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ClipboardList, Facebook, Twitter, Linkedin, Mail } from "lucide-react";
+import {  Facebook, Twitter, Linkedin, Mail } from "lucide-react";
+import { image2 } from "@/assets/icons";
 
 export default function Footer() {
   return (
@@ -10,8 +11,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
             <Link to="/" className="flex items-center">
-              <ClipboardList className="h-6 w-6 text-primary" />
-              <span className="ml-2 text-lg font-semibold">AuditPro</span>
+              <img src={image2} alt="" style={{ width: '200px', height: '100px' }}></img>
             </Link>
             <p className="text-sm text-gray-600">
               Empowering businesses with comprehensive auditing solutions.

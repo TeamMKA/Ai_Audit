@@ -89,7 +89,7 @@ export default function Navbar() {
                                             className="flex text-black items-center space-x-2 text-base font-medium"
                                         >
                                             <Home className="h-5 w-5" />
-                                            <span>Dashboard</span>
+                                            <span>Workspace</span>
                                         </Link>
                                     </SheetClose>
                                     <SheetClose asChild>
@@ -115,7 +115,7 @@ export default function Navbar() {
                                             to="/analytics"
                                             className="flex text-black items-center space-x-2 text-base font-medium"
                                         >
-                                            <BarChart className="h-5 w-5" />
+                                            <ClipboardList className="h-5 w-5" />
                                             <span>Analytic</span>
                                         </Link>
                                     </SheetClose>
@@ -126,6 +126,15 @@ export default function Navbar() {
                                         >
                                             <BarChart className="h-5 w-5" />
                                             <span>Anomalies</span>
+                                        </Link>
+                                    </SheetClose>
+                                    <SheetClose asChild>
+                                        <Link
+                                            to="/price"
+                                            className="flex text-black items-center space-x-2 text-base font-medium"
+                                        >
+                                            <BarChart className="h-5 w-5" />
+                                            <span>Pricing</span>
                                         </Link>
                                     </SheetClose>
                                 </div>
@@ -175,8 +184,8 @@ export default function Navbar() {
                 </div>
                 <div className="ml-auto mr-8 flex items-center space-x-4">
                     <div className="hidden md:flex md:items-center md:space-x-4">
-                        <Link to="/" className="text-sm font-medium">
-                            Dashboard
+                        <Link to="/work" className="text-sm font-medium">
+                            Workspace
                         </Link>
                         <Link to="/audits" className="text-sm font-medium">
                             Audits
@@ -189,6 +198,9 @@ export default function Navbar() {
                         </Link>
                         <Link to="/anom" className="text-sm font-medium">
                             Anomalies
+                        </Link>
+                        <Link to="/price" className="text-sm font-medium">
+                            Pricing
                         </Link>
                     </div>
                     {/* <form className="hidden md:block">
