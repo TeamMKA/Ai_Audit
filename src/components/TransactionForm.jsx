@@ -143,7 +143,7 @@ export default function AuditForm() {
             dateTime,
         }
 
-        if (uploadType === "manual") {
+        if (uploadType === "manual") { 
             // Post audit data if it's of audit type
             if (dataType === "audit") {
                 await postAuditData(auditEntry)
