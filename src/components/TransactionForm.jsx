@@ -56,6 +56,20 @@ export default function AuditForm() {
 
     const addAuditEntry = async (newEntry) => {
         try {
+                const response = await fetch(
+                    "https://dndck985-8000.inc1.devtunnels.ms/payments",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(data),
+                    }
+                ) 
+                if (!response.ok) {
+                    throw new Error("Network response was not ok")
+                }
+    
             // Add the audit entry to Firestore
             const docRef = await addDoc(collection(db, "audits"), newEntry)
             console.log("Audit entry added with ID: ", docRef.id)
