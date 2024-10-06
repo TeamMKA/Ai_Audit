@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { ChevronDown, ChevronUp, Download, Printer } from "lucide-react"
+import { ChevronDown, ChevronUp, Download,Share2 } from "lucide-react"
 import { collection, getDocs } from "firebase/firestore"
 import { db } from "../service/firebase.js" // Adjust the path based on your structure
 
