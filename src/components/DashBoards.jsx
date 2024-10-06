@@ -338,7 +338,7 @@ export function DashBoards() {
                   </CardDescription>
                 </CardHeader>
                 <CardFooter>
-                  <Button  > <Link to={"/upload"} >Audit New Transactions</Link> </Button>
+                  <Button  > <Link to={"/upload"} >Analyze New Transactions</Link> </Button>
                 </CardFooter>
               </Card>
               <Card x-chunk="dashboard-05-chunk-1">

@@ -14,33 +14,34 @@ const TallyReports = () => {
   }, []);
 
   return (
-    <div className="bg-gray-900 text-white p-6">
+    <div className="bg-white text-black p-6">
       {/* Invoices */}
-      <h2 className="text-3xl font-bold my-6 border-b border-gray-700 pb-2">Invoices</h2>
-      <table className="min-w-full bg-gray-800 border border-gray-600 rounded-lg shadow-md">
-        <thead className="bg-gray-700">
-          <tr>
-            <th className="py-3 px-5 border-b">Voucher No</th>
-            <th className="py-3 px-5 border-b">Customer</th>
-            <th className="py-3 px-5 border-b">Amount</th>
-            <th className="py-3 px-5 border-b">Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {invoices.map((invoice, index) => (
-            <tr key={index} className="hover:bg-gray-600 transition duration-200">
-              <td className="py-3 px-5 border-b border-gray-600">{invoice.VoucherNo}</td>
-              <td className="py-3 px-5 border-b border-gray-600">{invoice.Customer}</td>
-              <td className="py-3 px-5 border-b border-gray-600">{invoice.Amount}</td>
-              <td className="py-3 px-5 border-b border-gray-600">{invoice.Date}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+     {/* Invoices */}
+<h2 className="text-3xl font-bold my-6 border-b border-black pb-2">Invoices</h2>
+<table className="min-w-full bg-white border border-black rounded-lg shadow-md">
+  <thead className="bg-white">
+    <tr>
+      <th className="py-3 px-5 border-b border-black text-center">Voucher No</th>
+      <th className="py-3 px-5 border-b border-black text-center">Customer</th>
+      <th className="py-3 px-5 border-b border-black text-center">Amount</th>
+      <th className="py-3 px-5 border-b border-black text-center">Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    {invoices.map((invoice, index) => (
+      <tr key={index} className="hover:transition duration-200">
+        <td className="py-3 px-5 border-b border-black text-center">{invoice.VoucherNo}</td>
+        <td className="py-3 px-5 border-b border-black text-center">{invoice.Customer}</td>
+        <td className="py-3 px-5 border-b border-black text-center">{invoice.Amount}</td>
+        <td className="py-3 px-5 border-b border-black text-center">{invoice.Date}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
 
       {/* Profit & Loss */}
-      <h2 className="text-3xl font-bold my-6 border-b border-gray-700 pb-2">Profit & Loss</h2>
-      <div className="bg-gray-800 border border-gray-600 rounded-lg shadow-md p-5">
+      <h2 className="text-3xl font-bold my-6 border-b border-black pb-2">Profit & Loss</h2>
+      <div className="bg-white border border-black rounded-lg shadow-md p-5">
         <p><strong>Revenue:</strong> {profitLoss.Revenue}</p>
         <p><strong>Cost of Goods Sold:</strong> {profitLoss.CostOfGoodsSold}</p>
         <p><strong>Gross Profit:</strong> {profitLoss.GrossProfit}</p>
@@ -49,8 +50,8 @@ const TallyReports = () => {
       </div>
 
       {/* Balance Sheet */}
-      <h2 className="text-3xl font-bold my-6 border-b border-gray-700 pb-2">Balance Sheet</h2>
-      <div className="bg-gray-800 border border-gray-600 rounded-lg shadow-md p-5">
+      <h2 className="text-3xl font-bold my-6 border-b border-black pb-2">Balance Sheet</h2>
+      <div className="bg-white border border-black rounded-lg shadow-md p-5">
         <h3 className="font-semibold">Assets</h3>
         <p><strong>Cash:</strong> {balanceSheet?.Assets?.Cash}</p>
         <p><strong>Accounts Receivable:</strong> {balanceSheet?.Assets?.AccountsReceivable}</p>

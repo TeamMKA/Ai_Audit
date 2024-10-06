@@ -138,7 +138,7 @@ export default function Navbar() {
               Anomalies
             </Link>
           </div>
-          <form className="hidden md:block">
+          {/* <form className="hidden md:block">
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
               <Input
@@ -147,7 +147,7 @@ export default function Navbar() {
                 className="pl-8 md:w-[200px] lg:w-[300px]"
               />
             </div>
-          </form>
+          </form> */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-full">

@@ -74,7 +74,7 @@ export default function AuditHistory() {
 
     return (
         <div className="container mx-auto p-4">
-            <h2 className="text-2xl font-bold mb-4">Audit History</h2>
+            <h2 className="text-2xl font-bold mb-4">Transaction History</h2>
 
             <div className="flex justify-between items-center mb-4">
                 <div className="flex space-x-2">
