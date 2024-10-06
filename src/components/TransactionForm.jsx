@@ -17,7 +17,6 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-
 import Papa from "papaparse" // For CSV parsing
 import * as XLSX from "xlsx" // For Excel parsing
 import { db } from "../service/firebase.js" // Firebase setup
@@ -34,6 +33,7 @@ const departments = ["HR", "Finance", "Research", "Admissions", "IT Support"]
 const statuses = ["Pending", "Completed", "Failed"]
 
 export default function AuditForm() {
+    const [dataType, setDataType] = useState("transaction") // New state for data type
     const [type, setType] = useState("")
     const [amount, setAmount] = useState("")
     const [department, setDepartment] = useState("")
@@ -45,9 +45,11 @@ export default function AuditForm() {
     const [transactionHistory, setTransactionHistory] = useState([])
 
     useEffect(() => {
+        // Load existing audit data from local storage
         const storedAudits = JSON.parse(localStorage.getItem("audits")) || []
         setTransactionHistory(storedAudits)
 
+        // Auto-fill current date and time
         const currentDateTime = new Date().toLocaleString()
         setDateTime(currentDateTime)
     }, [])
@@ -58,6 +60,7 @@ export default function AuditForm() {
             const docRef = await addDoc(collection(db, "audits"), newEntry)
             console.log("Audit entry added with ID: ", docRef.id)
 
+            // Update local transaction history and store it locally
             const updatedAudits = [...transactionHistory, newEntry]
             localStorage.setItem("audits", JSON.stringify(updatedAudits))
             setTransactionHistory(updatedAudits)
@@ -66,21 +69,87 @@ export default function AuditForm() {
         }
     }
 
+    const addAnomalyEntry = async (anomalyData) => {
+        try {
+            // Add anomaly entry to Firestore
+            const docRef = await addDoc(collection(db, "anomaly"), anomalyData)
+            console.log("Anomaly entry added with ID: ", docRef.id)
+        } catch (e) {
+            console.error("Error adding anomaly entry: ", e)
+        }
+    }
+
+    const postAuditData = async (data) => {
+        try {
+            const response = await fetch(
+                "https://dndck985-8000.inc1.devtunnels.ms/detect",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                }
+            )
+
+            if (!response.ok) {
+                throw new Error("Network response was not ok")
+            }
+
+            const result = await response.json()
+            console.log("Audit data posted successfully:", result)
+
+            // After successful response, store anomaly data
+
+            // Assuming the response contains an anomaly field
+            const transactions = result.results || []
+            for (const transaction of transactions) {
+                const { Flag: flag, "Anomaly Type": anomalyType } = transaction
+
+                // Check if there's an anomaly (flag or anomaly type)
+                // Create an anomaly entry for Firestore
+                const anomalyEntry = {
+                    transactionId: transaction["Transaction ID"],
+                    date: transaction["Date"],
+                    category: transaction["Category"],
+                    amount: transaction["Amount (INR)"],
+                    description: transaction["Description"],
+                    flag, // Store the flag (if any)
+                    anomalyType, // Store the anomaly type (if any)
+                    timestamp: new Date().toISOString(), // Timestamp of when the anomaly is stored
+                }
+
+                // Save the anomaly entry to Firebase
+                await addAnomalyEntry(anomalyEntry)
+                console.log("Anomaly entry saved:", anomalyEntry)
+            }
+            console.log("Anomaly data saved successfully!")
+        } catch (error) {
+            console.error("Error posting audit data:", error)
+        }
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault()
 
-        if (uploadType === "manual") {
-            const auditEntry = {
-                type,
-                amount,
-                department,
-                payee,
-                status,
-                dateTime,
-            }
+        // Create audit entry for manual entry or file upload
+        const auditEntry = {
+            type,
+            amount,
+            department,
+            payee,
+            status,
+            dateTime,
+        }
 
-            await addAuditEntry(auditEntry)
-            alert("Audit submitted!")
+        if (uploadType === "manual") {
+            // Post audit data if it's of audit type
+            if (dataType === "audit") {
+                await postAuditData(auditEntry)
+            } else {
+                await addAuditEntry(auditEntry)
+            }
+            alert("Entry submitted successfully!")
         } else if (file) {
             await parseFile(file)
         } else {
@@ -88,6 +157,10 @@ export default function AuditForm() {
         }
 
         // Reset form fields
+        resetFormFields()
+    }
+
+    const resetFormFields = () => {
         setType("")
         setAmount("")
         setDepartment("")
@@ -117,9 +190,14 @@ export default function AuditForm() {
                         dateTime: row.dateTime || new Date().toLocaleString(),
                     }))
 
-                    // Upload each parsed entry to Firestore
+                    // Process each parsed entry
                     for (const auditEntry of parsedData) {
-                        await addAuditEntry(auditEntry)
+                        if (dataType === "audit") {
+                            await postAuditData(auditEntry)
+                            break
+                        } else {
+                            await addAuditEntry(auditEntry)
+                        }
                     }
 
                     alert("CSV File Uploaded Successfully!")
@@ -142,9 +220,13 @@ export default function AuditForm() {
                     dateTime: row.dateTime || new Date().toLocaleString(),
                 }))
 
-                // Upload each parsed entry to Firestore
+                // Process each parsed entry
                 for (const auditEntry of parsedData) {
-                    await addAuditEntry(auditEntry)
+                    if (dataType === "audit") {
+                        await postAuditData(auditEntry)
+                    } else {
+                        await addAuditEntry(auditEntry)
+                    }
                 }
 
                 alert("Excel File Uploaded Successfully!")
@@ -158,7 +240,7 @@ export default function AuditForm() {
     return (
         <Card className="w-full m-4 max-w-2xl mx-auto">
             <CardHeader>
-                <CardTitle>New Audit Entry</CardTitle>
+                <CardTitle>New Entry</CardTitle>
                 <CardDescription>
                     Choose to fill the details manually or upload a CSV/Excel
                     file.
@@ -191,24 +273,26 @@ export default function AuditForm() {
                 {uploadType === "manual" ? (
                     <form onSubmit={handleSubmit} className="space-y-4">
                         {/* Audit Type Field */}
-                        <div className="space-y-2">
-                            <Label htmlFor="type">Audit Type</Label>
-                            <Select value={type} onValueChange={setType}>
-                                <SelectTrigger id="type">
-                                    <SelectValue placeholder="Select audit type" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {auditTypes.map((auditType) => (
-                                        <SelectItem
-                                            key={auditType}
-                                            value={auditType}
-                                        >
-                                            {auditType}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
+                        {dataType === "audit" && (
+                            <div className="space-y-2">
+                                <Label htmlFor="type">Audit Type</Label>
+                                <Select value={type} onValueChange={setType}>
+                                    <SelectTrigger id="type">
+                                        <SelectValue placeholder="Select audit type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {auditTypes.map((auditType) => (
+                                            <SelectItem
+                                                key={auditType}
+                                                value={auditType}
+                                            >
+                                                {auditType}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
 
                         {/* Amount Field */}
                         <div className="space-y-2">
@@ -283,6 +367,25 @@ export default function AuditForm() {
                     </form>
                 ) : (
                     <div className="space-y-4">
+                        <div className="space-y-4">
+                            <Label htmlFor="dataType">Select Data Type</Label>
+                            <Select
+                                value={dataType}
+                                onValueChange={setDataType}
+                            >
+                                <SelectTrigger id="dataType">
+                                    <SelectValue placeholder="Select data type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="transaction">
+                                        Transaction Data
+                                    </SelectItem>
+                                    <SelectItem value="audit">
+                                        Audit Data
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                         <Label htmlFor="fileUpload">
                             Upload CSV/Excel File
                         </Label>
