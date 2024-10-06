@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
 import { db } from '../service/firebase.js'; // Make sure you import your Firebase config
 
 const Anomalities = () => {
@@ -14,9 +14,9 @@ const Anomalities = () => {
       const anomalySnapshot = await getDocs(anomaliesCollection);
       const anomaliesList = anomalySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 
-      // Group anomalies by flag (Low, Medium, High)
+      // Group anomalies by flag (Low, Medium, High, Critical, Completed)
       const groupedAnomalies = anomaliesList.reduce((acc, anomaly) => {
-        const flag = anomaly.flag || 'Uncategorized'; // Handle missing flags
+        const flag = anomaly.status === 'Completed' ? 'Completed' : (anomaly.flag || 'Uncategorized'); // Handle missing flags
         if (!acc[flag]) {
           acc[flag] = [];
         }
@@ -41,6 +41,17 @@ const Anomalities = () => {
     setSelectedAnomaly(flag);
   };
 
+  const markAsCompleted = async (anomalyId) => {
+    try {
+      const anomalyRef = doc(db, 'anomaly', anomalyId);
+      await updateDoc(anomalyRef, { status: 'Completed' });
+      alert('Anomaly marked as completed.');
+      fetchAnomalyData(); // Refresh the data
+    } catch (error) {
+      console.error('Error marking anomaly as completed:', error);
+    }
+  };
+
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <h1 className="text-2xl font-bold text-center mb-6">Anomalies</h1>
@@ -57,19 +68,24 @@ const Anomalities = () => {
         >
           Medium
         </button>
-        <button
+{/*         <button
           className={`px-4 py-2 rounded ${selectedAnomaly === 'High' ? 'bg-red-500 text-white' : 'bg-white text-red-500 border border-red-500'}`}
           onClick={() => handleSelect('High')}
         >
           High
-        </button>
+        </button> */}
         <button
           className={`px-4 py-2 rounded ${selectedAnomaly === 'Critical' ? 'bg-red-500 text-white' : 'bg-white text-red-500 border border-red-500'}`}
           onClick={() => handleSelect('Critical')}
         >
           Critical
         </button>
-        
+        <button
+          className={`px-4 py-2 rounded ${selectedAnomaly === 'Completed' ? 'bg-green-500 text-white' : 'bg-white text-green-500 border border-green-500'}`}
+          onClick={() => handleSelect('Completed')}
+        >
+          Completed
+        </button>
       </div>
 
       {loading ? (
@@ -86,6 +102,15 @@ const Anomalities = () => {
                 <p className="text-gray-600"><strong>Amount:</strong> ₹{anomaly.amount.toLocaleString()}</p>
                 <p className="text-gray-600"><strong>Date:</strong> {anomaly.date}</p>
                 <p className="text-gray-600"><strong>Timestamp:</strong> {new Date(anomaly.timestamp).toLocaleString()}</p>
+                <p className="text-gray-600"><strong>Status:</strong> {anomaly.status || 'Pending'}</p>
+                {anomaly.status !== 'Completed' && (
+                  <button
+                    className="mt-4 px-4 py-2 bg-green-500 text-white rounded"
+                    onClick={() => markAsCompleted(anomaly.id)}
+                  >
+                    Mark as Completed
+                  </button>
+                )}
               </div>
             ))}
           {(!findings[selectedAnomaly] || findings[selectedAnomaly].length === 0) && (
