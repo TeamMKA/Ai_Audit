@@ -164,7 +164,7 @@ export default function Navbar() {
                         </div>
                     </SheetContent>
                 </Sheet>
-                <div className="flex items-center">
+                <div className="flex ml-10 items-center">
                     <Link to="/" className="flex items-center">
                         <ClipboardList className="h-6 w-6 text-primary" />
                         <span className="ml-2 text-lg font-semibold">
@@ -172,7 +172,7 @@ export default function Navbar() {
                         </span>
                     </Link>
                 </div>
-                <div className="ml-auto flex items-center space-x-4">
+                <div className="ml-auto mr-8 flex items-center space-x-4">
                     <div className="hidden md:flex md:items-center md:space-x-4">
                         <Link to="/" className="text-sm font-medium">
                             Dashboard
@@ -190,7 +190,7 @@ export default function Navbar() {
                             Anomalies
                         </Link>
                     </div>
-                    <form className="hidden md:block">
+                    {/* <form className="hidden md:block">
                         <div className="relative">
                             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
                             <Input
@@ -199,7 +199,7 @@ export default function Navbar() {
                                 className="pl-8 md:w-[200px] lg:w-[300px]"
                             />
                         </div>
-                    </form>
+                    </form> */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button
