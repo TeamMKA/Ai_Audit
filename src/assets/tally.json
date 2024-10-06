@@ -1,0 +1,28 @@
+{
+  "invoices": [
+    { "VoucherNo": "INV001", "Customer": "John Doe", "Amount": 1500, "Date": "2024-01-01" },
+    { "VoucherNo": "INV002", "Customer": "Jane Smith", "Amount": 2500, "Date": "2024-01-02" },
+    { "VoucherNo": "INV003", "Customer": "Mark Wilson", "Amount": 3200, "Date": "2024-01-03" }
+  ],
+  "profitLoss": {
+    "Revenue": 100000,
+    "CostOfGoodsSold": 60000,
+    "GrossProfit": 40000,
+    "OperatingExpenses": 20000,
+    "NetProfit": 20000
+  },
+  "balanceSheet": {
+    "Assets": {
+      "Cash": 50000,
+      "AccountsReceivable": 30000,
+      "Inventory": 20000
+    },
+    "Liabilities": {
+      "AccountsPayable": 20000,
+      "Loans": 30000
+    },
+    "Equity": {
+      "RetainedEarnings": 40000
+    }
+  }
+}
