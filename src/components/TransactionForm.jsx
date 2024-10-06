@@ -21,6 +21,7 @@ import Papa from "papaparse" // For CSV parsing
 import * as XLSX from "xlsx" // For Excel parsing
 import { db } from "../service/firebase.js" // Firebase setup
 import { collection, addDoc } from "firebase/firestore" // Firestore functions
+import { data } from "autoprefixer"
 
 const auditTypes = [
     "Salary Payment",
@@ -158,6 +159,7 @@ export default function AuditForm() {
 
         // Reset form fields
         resetFormFields()
+        window.location.href = "/audits"
     }
 
     const resetFormFields = () => {
@@ -194,9 +196,30 @@ export default function AuditForm() {
                     for (const auditEntry of parsedData) {
                         if (dataType === "audit") {
                             await postAuditData(auditEntry)
+
                             break
                         } else {
                             await addAuditEntry(auditEntry)
+                        }
+                    }
+                    console.log(parsedData)
+                    if (dataType != "audit") {
+                        const response = await fetch(
+                            "https://dndck985-8000.inc1.devtunnels.ms/payments",
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                // Wrap parsedData in an object with key "data"
+                                body: JSON.stringify({ data: parsedData }),
+                            }
+                        )
+                        console.log(response)
+
+                        // Handle non-ok response (optional)
+                        if (!response.ok) {
+                            throw new Error("Network response was not ok")
                         }
                     }
 
@@ -399,10 +422,7 @@ export default function AuditForm() {
                 )}
             </CardContent>
             <CardFooter className="flex justify-end space-x-2">
-                <Button
-                    onClick={handleSubmit}
-                    className="bg-black text-white"
-                >
+                <Button onClick={handleSubmit} className="bg-black text-white">
                     Submit
                 </Button>
             </CardFooter>
