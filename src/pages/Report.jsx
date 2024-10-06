@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { ChevronDown, ChevronUp, Download, Printer } from 'lucide-react'
+import { useState } from 'react';
+import { ChevronDown, ChevronUp, Download, Share2 } from 'lucide-react';
+import html2pdf from 'html2pdf.js'; // Import html2pdf
 
 const auditData = {
   companyName: "TechCorp Solutions",
@@ -30,22 +31,52 @@ const auditData = {
     }
   ],
   summary: "The audit revealed some areas for improvement, particularly in financial reporting and internal controls. Immediate attention is required for the high-severity findings. Overall, the company shows a commitment to compliance and continuous improvement."
-}
+};
 
 export default function AuditReport() {
-  const [expandedFindings, setExpandedFindings] = useState([])
+  const [expandedFindings, setExpandedFindings] = useState([]);
 
   const toggleFinding = (id) => {
-    setExpandedFindings(prev => 
+    setExpandedFindings(prev =>
       prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
-    )
-  }
+    );
+  };
+
+  // Function to download the PDF
+  const downloadPdf = () => {
+    const element = document.getElementById('report-content'); // Element to be converted to PDF
+    const options = {
+      filename: `${auditData.companyName}_Audit_Report.pdf`,
+      margin: 10,
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().from(element).set(options).save();
+  };
+
+  // Function to send the report via email (opens mail client)
+  const shareViaEmail = () => {
+    const emailSubject = encodeURIComponent(`${auditData.companyName} Audit Report`);
+    const emailBody = encodeURIComponent(`Please find the audit report for ${auditData.companyName}. Download the report and attach the PDF manually.`);
+    window.location.href = `mailto:?subject=${emailSubject}&body=${emailBody}`;
+  };
+
+  // Function to share report via WhatsApp (opens WhatsApp link)
+  const shareViaWhatsApp = () => {
+    const whatsappMessage = encodeURIComponent(
+      `Audit Report for ${auditData.companyName}\n\nAudit Period: ${auditData.auditPeriod}\nAuditor: ${auditData.auditor}\nDate: ${auditData.date}\n\nFindings:\n` +
+      auditData.findings.map(finding => 
+        `${finding.category} - ${finding.severity}: ${finding.description} (Recommendation: ${finding.recommendation})`
+      ).join('\n\n') + `\n\nSummary:\n${auditData.summary}`
+    );
+    window.open(`https://wa.me/?text=${whatsappMessage}`, '_blank');
+  };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+    <div id="report-content" className="max-w-4xl mt-4 mb-4 mx-auto p-6 bg-[#d8d8cd] shadow-lg rounded-lg">
       <header className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Audit Report</h1>
-        <p className="text-xl text-gray-600">{auditData.companyName}</p>
+        <p className="text-xl text-gray-600">K J Somaiya Institue of Technology</p>
       </header>
 
       <section className="mb-8">
@@ -108,15 +139,28 @@ export default function AuditReport() {
       </section>
 
       <footer className="flex justify-end space-x-4">
-        <button className="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded transition-colors duration-150 ease-in-out">
-          <Printer className="mr-2 h-5 w-5" />
-          Print Report
+        <button
+          onClick={shareViaEmail}
+          className="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded transition-colors duration-150 ease-in-out"
+        >
+          <Share2 className="mr-2 h-5 w-5" />
+          Share via Email
         </button>
-        <button className="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors duration-150 ease-in-out">
+        <button
+          onClick={shareViaWhatsApp}
+          className="flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded transition-colors duration-150 ease-in-out"
+        >
+          <Share2 className="mr-2 h-5 w-5" />
+          Share via WhatsApp
+        </button>
+        <button
+          onClick={downloadPdf}
+          className="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors duration-150 ease-in-out"
+        >
           <Download className="mr-2 h-5 w-5" />
           Download PDF
         </button>
       </footer>
-      </div>
-)
+    </div>
+  );
 }
