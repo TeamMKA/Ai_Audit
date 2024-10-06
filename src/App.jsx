@@ -9,6 +9,8 @@ import DashBoard from "./pages/DashBoard"
 import Anomalies from "./pages/Anomalies"
 import Analytics from "./pages/Analytics"
 import ReportBody from "./pages/Report.jsx"
+import Individual from "./components/Individual"
+import TransactionFrom from "./components/TransactionForm" 
 
 const App = () => {
     return (
@@ -20,10 +22,11 @@ const App = () => {
                     <Route exact path="/trail" element={<Trail />} />
                     <Route exact path="/audits" element={<TransactionHistory />} />
                     <Route exact path="/reports" element={<ReportBody/>} />
-                    <Route exact path="/upload" element={<UploadDoc />} />
-                    <Route exact path="/dashboard" element={<DashBoard />} />
+                    <Route exact path="/new" element={<UploadDoc />} />
+                    <Route exact path="/upload" element={<TransactionFrom />} />
                     <Route exact path="/anom" element={<Anomalies />} />
                     <Route exact path="/analytics" element={ <Analytics />} />
+                    <Route exact path="/ind" element={ <Individual />} />
                 </Routes>
                 <Footer />
             </div>

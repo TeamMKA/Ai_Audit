@@ -1,9 +1,10 @@
-import TransactionForm from "../components/TransactionForm"
+import { DashBoards } from "@/components/DashBoards"
+
 
 const Home = () => {
   return (
     <div>
-      <TransactionForm/>
+      <DashBoards />
     </div>
   )
 }
