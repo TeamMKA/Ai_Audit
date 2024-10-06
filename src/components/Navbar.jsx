@@ -31,6 +31,7 @@ import {
     LogOut,
 } from "lucide-react"
 import { Link } from "react-router-dom"
+import {  image2 } from "@/assets/icons"
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false)
@@ -166,9 +167,9 @@ export default function Navbar() {
                 </Sheet>
                 <div className="flex ml-10 items-center">
                     <Link to="/" className="flex items-center">
-                        <ClipboardList className="h-6 w-6 text-primary" />
+                        {/* <ClipboardList className="h-6 w-6 text-primary" /> */}
                         <span className="ml-2 text-lg font-semibold">
-                            AuditPro
+                        <img src={image2} alt="" style={{ width: '200px', height: '100px' }} />
                         </span>
                     </Link>
                 </div>
@@ -202,16 +203,27 @@ export default function Navbar() {
                     </form> */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button
+                           {isAuthenticated
+                           ?<Button
                                 variant="ghost"
                                 size="icon"
-                                className="rounded-full"
+                                className="rounded-full border border-black "
                             >
                                 <User className="h-5 w-5" />
                                 <span className="sr-only">
                                     Toggle user menu
                                 </span>
-                            </Button>
+                            </Button> 
+                            :<Button
+                                variant="ghost"
+                                size="icon"
+                                className="rounded-full border"
+                            >
+                                <User className="h-5 w-5" />
+                                <span className="sr-only">
+                                    Toggle user menu
+                                </span>
+                            </Button>} 
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuLabel>My Account</DropdownMenuLabel>
